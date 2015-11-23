@@ -5,30 +5,58 @@ import akka.actor.UntypedActor;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import com.typesafe.config.ConfigFactory;
+import java.util.HashMap;
 
 public class RemoteChatServiceActor extends UntypedActor {
   
-  //String greeting = "";
+  
   private GuiServer chat;
-
+  private HashMap <ActorRef,String> users;
+  private Messages messages;
         
   public RemoteChatServiceActor(GuiServer chat) {
     this.chat = chat;
-    //chat.getTextAreaMessages().setText("ok\n");
+    messages = new Messages();
+    users = new HashMap<>();
+
+    /*
+    for(ActorRef ref : users.keySet())
+        ref.tell(,getSelf());
+    */
+  }
+
+  private void writeToLog(String logMessage) {
+      this.chat.getLog().setText(this.chat.getLog().getText()+logMessage);
   }
         
   @Override
   public void onReceive(Object message) {
-      String content = this.chat.getTextAreaMessages().getText();
-      this.chat.getTextAreaMessages().setText(content+"ok\n");
-      // chat.getTextAreaMessages().setText("ok\n");
-      /*
-      else {
-        unhandled(message);
+      
+      switch(message.getClass().getSimpleName()) {
+
+        case "LoginMessage": 
+                            handleLoginMessage(message); 
+                            break;
+
+        case "LogoutMessage": 
+                            //handleLogoutMessage(message); 
+                             break;
+
+        case "ChatMessage": 
+                            //handleChatMessage(message); 
+                            break;
+
+        default: 
+                writeToLog("Messaggio non riconosciuto!...");
+                break;
+                        
       }
-      */
   }
-  
+
+  private void handleLoginMessage(Object message) {
+          writeToLog("ok");
+  }
+
   public static void main(String[] args) {
 
     GuiServer frame = new GuiServer();

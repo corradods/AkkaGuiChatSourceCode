@@ -20,19 +20,23 @@ import com.typesafe.config.ConfigFactory;
         private GuiChat chat;
         private final String path;
         private ActorRef remoteActor = null;
-        private String nickname;
 
         public Communicator(String path, GuiChat chat) {
             this.chat = chat;
             this.path = path;
-            this.nickname="";
             sendIdentifyRequest();
-
             //chat.getTextAreaMessages().setText("ok\n");
         }
 
+        private void sendIdentifyRequest() {
+
+            getContext().actorSelection(path).tell(new Identify(path), getSelf());
+            getContext().system().scheduler().scheduleOnce(Duration.create(3, SECONDS), getSelf(),ReceiveTimeout.getInstance(), getContext().dispatcher(), getSelf());
+        }
         
-        
+         private void writeToRoom(String logMessage) {
+            this.chat.getRoom().setText(logMessage);
+        }
         @Override
         public void onReceive(Object message) throws Exception {
             if (message instanceof ActorIdentity) {
@@ -40,14 +44,14 @@ import com.typesafe.config.ConfigFactory;
                 if (remoteActor == null) {
                     System.out.println("Remote actor not available: " + path);
                 } else {
-                     chat.getTextAreaMessages().setText("SUCCESSFULLY CONNECTED TO THE SERVER!!");
+                    writeToRoom("SUCCESSFULLY CONNECTED TO THE SERVER!!");
                     getContext().watch(remoteActor);
                     getContext().become(active, true);
                  }
             } else if (message instanceof ReceiveTimeout) {
                 sendIdentifyRequest();
             } else {
-                chat.getTextAreaMessages().setText("Not ready yet");
+                writeToRoom("Not ready yet");
             }
         }
 
@@ -55,7 +59,7 @@ import com.typesafe.config.ConfigFactory;
         @Override
             public void apply(Object message) {
                 if (message instanceof Terminated) {
-                    chat.getTextAreaMessages().setText("Calculator terminated");
+                    writeToRoom("Calculator terminated");
                     sendIdentifyRequest();
                     getContext().unbecome();
                 } else if (message instanceof ReceiveTimeout) {
@@ -66,23 +70,27 @@ import com.typesafe.config.ConfigFactory;
 
                     remoteActor.tell(message,getSelf());
                 	
-                }else if (message.getClass().getSimpleName().equals("DisconnectMessage")){
+                }else if (message.getClass().getSimpleName().equals("ChatMessage")){
+                        //deliver the InputMessage to the Server
+                        remoteActor.tell(message,getSelf());
+                        //test the printing on chat
+                        //chat.getTextAreaMessages().setText( chat.getTextAreaMessages().getText()+"\n"+((Messages.Msg)message).getContent());
+                }
+                else if(message.getClass().getSimpleName().equals("ToPrintMessage")){
+                    //print the message in the GUI
+                    
+                    String msgToPrint = ((Messages.ToPrintMessage)message).getContent();
+                    writeToRoom(chat.getRoom().getText()+"\n"+msgToPrint);
+                }
+                else if (message.getClass().getSimpleName().equals("DisconnectMessage")){
                 	
                 }
                 
                 else {
                     unhandled(message);
                 }
-                /*
-                String content = this.chat.getTextAreaMessages().getText();
-				this.chat.getTextAreaMessages().setText(content+"ok\n");
-               // chat.getTextAreaMessages().setText("ok\n");*/
-            }
-        private void sendIdentifyRequest() {
 
-            getContext().actorSelection(path).tell(new Identify(path), getSelf());
-            getContext().system().scheduler().scheduleOnce(Duration.create(3, SECONDS), getSelf(),ReceiveTimeout.getInstance(), getContext().dispatcher(), getSelf());
-        }
+            }
         };
 
     	public static void main(String[] args) {
