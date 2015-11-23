@@ -54,7 +54,20 @@ public class RemoteChatServiceActor extends UntypedActor {
   }
 
   private void handleLoginMessage(Object message) {
-          writeToLog("ok");
+          if(users.containsValue(((Messages.LoginMessage)message).getNickname())) //nickname gia usato
+              { 
+                writeToLog("SYSTEM: Nickname duplicato "+((Messages.LoginMessage)message).getNickname());
+                getSender().tell(messages.new RejectLogin("Questo nickname è gia in uso \n"),getSelf());
+
+                }
+          else
+            {
+              writeToLog("Nickname accettato "+ ((Messages.LoginMessage)message).getNickname()+"\n");
+              users.put(getSender(),((Messages.LoginMessage)message).getNickname());
+              getSender().tell(messages.new AckLogin("users"),getSelf());
+          }
+
+
   }
 
   public static void main(String[] args) {

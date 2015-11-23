@@ -49,6 +49,22 @@ public class GuiChat extends JFrame {
 		return this.room;
 	}
 
+	public void setBtnSend (boolean b) {
+		this.btnSend.setEnabled(b);
+	}
+
+	public void setBtnLogin (boolean b) {
+		this.btnLogin.setEnabled(b);
+	}
+
+	public void setClientInput (boolean b) {
+		this.clientInput.setEnabled(b);
+	}
+
+	public void setUsername (boolean b) {
+		this.username.setEnabled(b);
+	}
+
 	public void setActorReference(ActorRef communicator) {
 	    this.communicator = communicator;
 	}
@@ -120,9 +136,10 @@ public class GuiChat extends JFrame {
 		sl_contentPane.putConstraint(SpringLayout.EAST, btnLogin, -6, SpringLayout.WEST, btnDisconnect);
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				btnLogin.setEnabled(false);
+				username.setEnabled(false);
+				communicator.tell(messages.new LoginMessage(username.getText()),null);
 				
-				clientInput.setEnabled(true);
-				btnSend.setEnabled(true);
 			}
 		});
 		btnLogin.setFont(new Font("Yu Gothic UI Semilight", Font.BOLD, 14));
