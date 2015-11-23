@@ -13,7 +13,7 @@ public class Messages implements Serializable{
     		content = s;
     	}
 
-        public String GetContent() {
+        public String getContent() {
         	return content;
         }	
 	}
