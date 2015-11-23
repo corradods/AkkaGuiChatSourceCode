@@ -20,21 +20,18 @@ import com.typesafe.config.ConfigFactory;
         private GuiChat chat;
         private final String path;
         private ActorRef remoteActor = null;
+        private String nickname;
 
         public Communicator(String path, GuiChat chat) {
             this.chat = chat;
             this.path = path;
+            this.nickname="";
             sendIdentifyRequest();
 
             //chat.getTextAreaMessages().setText("ok\n");
         }
 
-        private void sendIdentifyRequest() {
-
-            getContext().actorSelection(path).tell(new Identify(path), getSelf());
-
-            getContext().system().scheduler().scheduleOnce(Duration.create(3, SECONDS), getSelf(),ReceiveTimeout.getInstance(), getContext().dispatcher(), getSelf());
-        }
+        
         
         @Override
         public void onReceive(Object message) throws Exception {
@@ -63,7 +60,7 @@ import com.typesafe.config.ConfigFactory;
                     getContext().unbecome();
                 } else if (message instanceof ReceiveTimeout) {
                     // ignore
-                } else if (message.getClass().getSimpleName().equals("Altro")){
+                } else if (message.getClass().getSimpleName().equals("Reply")){
                        remoteActor.tell(message,getSelf());
                 }else if (message.getClass().getSimpleName().equals("LoginMessage")){
 
@@ -81,6 +78,11 @@ import com.typesafe.config.ConfigFactory;
 				this.chat.getTextAreaMessages().setText(content+"ok\n");
                // chat.getTextAreaMessages().setText("ok\n");*/
             }
+        private void sendIdentifyRequest() {
+
+            getContext().actorSelection(path).tell(new Identify(path), getSelf());
+            getContext().system().scheduler().scheduleOnce(Duration.create(3, SECONDS), getSelf(),ReceiveTimeout.getInstance(), getContext().dispatcher(), getSelf());
+        }
         };
 
     	public static void main(String[] args) {
