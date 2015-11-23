@@ -83,7 +83,7 @@ public class GuiChat extends JFrame {
 
 				btnLogin.setEnabled(false);
 				username.setEnabled(false);
-				communicator.tell(messages.new Altro("ciao"),null);
+				communicator.tell(messages.new ChatMessage("ciao"),null);
 			}
 
 		});

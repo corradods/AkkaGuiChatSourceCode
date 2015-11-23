@@ -6,25 +6,46 @@ import akka.actor.ActorRef;
 
 public class Messages implements Serializable{
 	
-	class Altro implements Serializable {
+	class ChatMessage implements Serializable {
     	private String content;
     
-    	public Altro(String s){
-        	content = s;
-    	}
+    	public ChatMessage(String s){ content = s;}
+        public String GetContent() {return content;}	
+    	
 
 	}
+
 	class LoginMessage implements Serializable {
-		private ActorRef actor;
+		
 		private String nickname;
 
+		public LoginMessage(String nickname){ this.nickname = nickname;}
+		public String GetNickname() {return nickname;}	
 		
-		public LoginMessage(ActorRef actor){
-			this.actor = actor;
-			this.nickname = "prova";
+	}
+	
+	class LogoutMessage implements Serializable {
+		
+		private String nickname;
+
+		public LoginMessage(String nickname){ this.nickname = nickname;}
+		public String GetNickname() {return nickname;}	
+		
+	}
+	class RejectLogin implements Serializable {
+		
+		private String cause;
+
+		public RejectLogin(String cause){
+			this.cause = cause;
 		}
 	}
-	class DisconnectMessage implements Serializable {
+	class AckLogin implements Serializable {
 		
+		private String s;
+
+		public LoginMessage(String s){
+			this.s = s;
+		}
 	}
 }
