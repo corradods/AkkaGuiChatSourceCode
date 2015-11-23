@@ -84,8 +84,6 @@ public class GuiChat extends JFrame {
 
 				btnLogin.setEnabled(false);
 				username.setEnabled(false);
-				clientInput.setEnabled(true);
-				btnSend.setEnabled(true);
 				communicator.tell(messages.new LoginMessage(username.getText()),null);
 			}
 
@@ -95,6 +93,7 @@ public class GuiChat extends JFrame {
 		username.setColumns(10);
 		
 		btnDisconnect = new JButton("Disconnect");
+		btnDisconnect.setEnabled(false);
 		btnDisconnect.setForeground(new Color(255, 69, 0));
 		sl_contentPane.putConstraint(SpringLayout.NORTH, btnDisconnect, 12, SpringLayout.NORTH, contentPane);
 		sl_contentPane.putConstraint(SpringLayout.WEST, btnDisconnect, 332, SpringLayout.WEST, contentPane);

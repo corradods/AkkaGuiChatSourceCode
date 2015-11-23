@@ -58,38 +58,43 @@ import com.typesafe.config.ConfigFactory;
         Procedure<Object> active = new Procedure<Object>() {
         @Override
             public void apply(Object message) {
-                if (message instanceof Terminated) {
-                    writeToRoom("Calculator terminated");
-                    sendIdentifyRequest();
-                    getContext().unbecome();
-                } else if (message instanceof ReceiveTimeout) {
-                    // ignore
-                } else if (message.getClass().getSimpleName().equals("Reply")){
-                       remoteActor.tell(message,getSelf());
-                }else if (message.getClass().getSimpleName().equals("LoginMessage")){
+              
+                switch(message.getClass().getSimpleName()) {
 
-                    remoteActor.tell(message,getSelf());
-                	
-                }else if (message.getClass().getSimpleName().equals("ChatMessage")){
-                        //deliver the InputMessage to the Server
-                        remoteActor.tell(message,getSelf());
-                        //test the printing on chat
-                        //chat.getTextAreaMessages().setText( chat.getTextAreaMessages().getText()+"\n"+((Messages.Msg)message).getContent());
-                }
-                else if(message.getClass().getSimpleName().equals("ToPrintMessage")){
-                    //print the message in the GUI
+                    case "Terminated": 
+                            writeToRoom("Calculator terminated");
+                            sendIdentifyRequest();
+                            getContext().unbecome();
+                            break;
+
+                    case "ReceiveTimeout": 
+                            //ignore
+                             break;
+
+                    case "Reply": 
+                                    break;
                     
-                    String msgToPrint = ((Messages.ToPrintMessage)message).getContent();
-                    writeToRoom(chat.getRoom().getText()+"\n"+msgToPrint);
-                }
-                else if (message.getClass().getSimpleName().equals("DisconnectMessage")){
-                	
-                }
-                
-                else {
-                    unhandled(message);
-                }
+                    case: "ChatMessage":
+                                    break;
 
+                    case: "ToPrintMessage": String msgToPrint = ((Messages.ToPrintMessage)message).getContent();
+                                            writeToRoom(chat.getRoom().getText()+"\n"+msgToPrint);
+                    break;
+                            
+
+                    default: 
+                           writeToLog("Messaggio non riconosciuto!...");
+                            
+                        
+      }
+  }
+
+
+
+
+
+               
+                
             }
         };
 
